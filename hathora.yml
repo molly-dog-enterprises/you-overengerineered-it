@@ -1,0 +1,46 @@
+types:
+  LevelModifier:
+    attach: int
+    defence: int
+  Action: 
+    on: string
+    performOn: int[]
+    eventType: LevelModifier
+    eventValue: string
+  Card:
+    type: string
+    name: string
+    actions: Action[]
+    levels: LevelModifier
+    canApplyToOthers: int
+  CardState:
+    card: Card
+    level: int
+    attack: int
+    defence: int
+    actions: Action[]
+  PlayerState:
+    deck: CardState[]
+    lives: int
+    cash: int
+    selectedCard: CardState
+    pickableCards: CardState[]
+    opponentPickableCards: CardState[]
+    attachBonus: int
+    defenceBonuse: int
+
+methods:
+  joinGame:
+    name: string
+  startGame:
+  pickCard:
+    pickCard: Card
+  applyCard:
+    toCard: Card
+  endTurn:
+
+auth:
+  anonymous: {}
+
+userState: PlayerState
+error: string
