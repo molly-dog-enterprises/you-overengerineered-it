@@ -22,19 +22,28 @@ types:
     actions: Action[]
   PlayerState:
     userId: UserId?
-    gameName: string?
     deck: CardState[]
     lives: int
     cash: int
-    selectedCard: CardState?
     pickableCards: CardState[]
-    opponentPickableCards: CardState[]
+    selectedCardLocation: string?
+    selectedCardPosition: int?
     attachBonus: int
     defenceBonuse: int
+  UserState:
+    userId: UserId?
+    lives: int?
+    deck: CardState[]
+    cash: int?
+    selectedCardLocation: string?
+    selectedCardPosition: int?
+    pickableCards: CardState[]
+    opponentUserId: UserId?
+    opponentlives: int?
+    opponentPickableCards: CardState[]
 
 methods:
   joinGame:
-    name: string
   startGame:
   pickCard:
     pickCard: Card
@@ -45,5 +54,5 @@ methods:
 auth:
   anonymous: {}
 
-userState: PlayerState
+userState: UserState
 error: string
