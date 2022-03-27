@@ -1,0 +1,54 @@
+{
+  "type": "staff",
+  "name": "intern",
+  "actions": [
+    {
+      "on": "level up",
+      "type": "LevelModifier",
+      "performOn": [0],
+      "events": {
+        "attach": 2,
+        "defence": 2
+      }
+    }, {
+      "on": "faint",
+      "type": "Summon",
+      "performOn": [0],
+      "event": [
+        {
+          "name": "monster",
+          "value": "project-manager"
+        },
+        {
+          "name": "level",
+          "value": 1
+        }
+      ]      
+    }, {
+      "on": "death",
+      "type": "Summon",
+      "performOn": [-1],
+      "event": [
+        {
+          "name": "monster",
+          "value": "senior"
+        },
+        {
+          "name": "levelModifier",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "name": "attach",
+      "value": 2
+    },
+    {
+      "name": "defence",
+      "value": 2
+    }
+  ],
+  "cardLevel": 1
+}

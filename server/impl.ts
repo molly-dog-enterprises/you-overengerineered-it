@@ -3,7 +3,7 @@ import { Response } from "../api/base";
 import { createChannel, IPubSubFunction } from "./pubsub"
 import { getCards } from "./cards"
 import {
-  LevelModifier,
+  ActionDetails,
   Action,
   Card,
   CardState,

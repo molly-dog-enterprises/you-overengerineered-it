@@ -1,18 +1,27 @@
 types:
-  LevelModifier:
-    attach: int
-    defence: int
+  # ApplyAction:
+  #   action: Action
+  #   to: string
+  # Summon:
+  #   monster: string
+  #   level: int?
+  #   levelModifier: int?
+  # LevelModifier:
+  #   attach: int
+  #   defence: int
+  ActionDetails:
+    name: string
+    value: string 
   Action: 
+    type: string
     on: string
     performOn: int[]
-    eventType: LevelModifier
-    eventValue: string
+    event: ActionDetails[]
   Card:
     type: string
     name: string
     actions: Action[]
-    levels: LevelModifier
-    canApplyToOthers: int
+    levels: ActionDetails[]
     cardLevel: int
   CardState:
     card: Card
