@@ -1,7 +1,6 @@
 import { Methods, Context } from "./.hathora/methods";
 import { Response } from "../api/base";
-import { createChannel, IPubSubFunction } from "./pubsub"
-import { getCards } from "./cards"
+import { publish } from "./events"
 import {
   ActionDetails,
   Action,
@@ -9,6 +8,7 @@ import {
   CardState,
   PlayerState,
   UserState,
+  GameState,
   UserId,
   IJoinGameRequest,
   IStartGameRequest,
@@ -17,52 +17,7 @@ import {
   IEndTurnRequest,
 } from "../api/types";
 
-type InternalState = {
-  players: PlayerState[],
-  round: number,
-  maxCardLevel: number,
-  eventBus: { subscribe: IPubSubFunction, publish: IPubSubFunction },
-  roundRemaining: number
-}
-
-function playerActions(player: PlayerState, game: InternalState): IPubSubFunction {
-  return (details: {[key: string]: any}): void => {
-    // check if we can skip this message
-    if(details.skipPlayer === player.userId)
-      return 
-
-    for(let actionName in  details.actions) {
-      switch(actionName) {
-        case "refreshPickable": {
-          let cards: Card[] = getCards(game.maxCardLevel, 3)
-          break;
-        }
-      }
-  
-    }
-  }
-}
-
-function gameActions(game: InternalState): IPubSubFunction {
-  return (details: {[key: string]: any}): void => {
-    for(let actionName in  details.actions) {
-      switch(actionName) {
-        case "incRound": {
-          game.round++;
-          if(game.round % 3 == 0) 
-            game.maxCardLevel++;
-          break;
-        };
-        case "startCountdown": {
-          // need to implement the card pick countdown
-          break;
-        }
-      }
-  
-    }
-
-  }
-}
+type InternalState = GameState;
 
 export class Impl implements Methods<InternalState> {
   initialize(userId: UserId, ctx: Context): InternalState {
@@ -70,10 +25,10 @@ export class Impl implements Methods<InternalState> {
       players: [],
       round: 0,
       maxCardLevel: 1,
-      eventBus: createChannel(),
+      // eventBus: createChannel(),
       roundRemaining: 0
     };
-    state.eventBus.subscribe('game', gameActions(state));
+    // state.eventBus.subscribe('game', gameActions(state));
     return state;
   }
 
@@ -91,7 +46,7 @@ export class Impl implements Methods<InternalState> {
     state.players.push(player);
 
     // enrol player to event bus
-    state.eventBus.subscribe('player', playerActions(player, state));
+    // state.eventBus.subscribe('player', playerActions(player, state));
 
     return Response.ok();  
   }
@@ -105,8 +60,8 @@ export class Impl implements Methods<InternalState> {
     }
 
     // trigger round start to player
-    state.eventBus.publish('player', {skipPlayer: 'none', action: ['refreshPickable']});
-    state.eventBus.publish('game', {action: ['incRound', 'startCountdown']});
+    publish(state, 'players', {skipPlayer: 'none', actions: ['refreshPickable']});
+    publish(state, 'game', {actions: ['incRound', 'startCountdown']});
 
     return Response.ok();  
   }
@@ -128,6 +83,7 @@ export class Impl implements Methods<InternalState> {
       lives: user?.lives,
       deck: user?.deck || [],
       cash: user?.cash,
+      round: state.round,
       selectedCardPosition: user?.selectedCardPosition,
       selectedCardLocation: user?.selectedCardLocation,
       pickableCards: user?.pickableCards || [],

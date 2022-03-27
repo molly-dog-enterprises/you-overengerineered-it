@@ -1,8 +1,11 @@
 import { Card } from "../api/types"
 import { readdirSync, readFileSync } from "fs"
-import { extname, join } from "path"
+import { extname, join, dirname } from "path"
+import { fileURLToPath } from 'url';
 
-const dir = './cards';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const dir = join(__dirname, './cards');
 
 function init(): Card[] {
   return readdirSync(dir)
@@ -12,10 +15,15 @@ function init(): Card[] {
 
 const Cards: Card[] = init();
 
-console.log(Cards)
-
+// console.log(Cards)
 
 export function getCards(maxLevel: number, count: number): Card[] {
   let filteredCards = Cards.filter((card) => card.cardLevel <= maxLevel)
-  return filteredCards.slice(0, count-1);
-}
+  
+  let cards: Card[] = [];
+  for(let i = 0; i < count; i++) {
+    cards.push(filteredCards[0]);
+  }
+
+  return cards;
+} 

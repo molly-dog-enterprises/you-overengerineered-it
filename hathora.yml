@@ -1,22 +1,13 @@
 types:
-  # ApplyAction:
-  #   action: Action
-  #   to: string
-  # Summon:
-  #   monster: string
-  #   level: int?
-  #   levelModifier: int?
-  # LevelModifier:
-  #   attach: int
-  #   defence: int
   ActionDetails:
     name: string
-    value: string 
+    valueInt: int?
+    valueString: string?
   Action: 
-    type: string
+    name: string
     on: string
     performOn: int[]
-    event: ActionDetails[]
+    events: ActionDetails[]
   Card:
     type: string
     name: string
@@ -44,12 +35,18 @@ types:
     lives: int?
     deck: CardState[]
     cash: int?
+    round: int?
     selectedCardLocation: string?
     selectedCardPosition: int?
     pickableCards: CardState[]
     opponentUserId: UserId?
     opponentlives: int?
     opponentPickableCards: CardState[]
+  GameState:
+    players: PlayerState[]
+    round: int
+    maxCardLevel: int
+    roundRemaining: int
 
 methods:
   joinGame:
