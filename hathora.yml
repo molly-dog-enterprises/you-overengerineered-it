@@ -20,10 +20,12 @@ types:
     defence: int
     actions: Action[]
   PlayerState:
+    userId: UserId?
+    gameName: string?
     deck: CardState[]
     lives: int
     cash: int
-    selectedCard: CardState
+    selectedCard: CardState?
     pickableCards: CardState[]
     opponentPickableCards: CardState[]
     attachBonus: int
