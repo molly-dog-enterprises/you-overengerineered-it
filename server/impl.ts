@@ -1,5 +1,7 @@
 import { Methods, Context } from "./.hathora/methods";
 import { Response } from "../api/base";
+import { createChannel, IPubSubFunction } from "./pubsub"
+import { getCards } from "./cards"
 import {
   LevelModifier,
   Action,
@@ -20,13 +22,48 @@ type GameState = {
   winner: UserId | null,
   round: number,
   maxCardLevel: number,
-  eventBus: string,
+  eventBus: { subscribe: IPubSubFunction, publish: IPubSubFunction },
   roundRemaining: number
 }
 type InternalState = {
   games: GameState[],
   playerGames: Map<UserId, GameState>
   playerState: Map<UserId, PlayerState>
+}
+
+function playerActions(player: PlayerState, game: GameState): IPubSubFunction {
+  return (details: {[key: string]: any}): void => {
+    // check if we can skip this message
+    if(details.skip === player.userId)
+      return 
+
+    for(let actionName in  details.actions) {
+      switch(actionName) {
+        case "refreshPickable": {
+          let cards: Card[] = getCards(game.maxCardLevel, 3)
+          break;
+        }
+      }
+  
+    }
+  }
+}
+
+function gameActions(game: GameState): IPubSubFunction {
+  return (details: {[key: string]: any}): void => {
+    for(let actionName in  details.actions) {
+      switch(actionName) {
+        case "incRound": {
+          game.round++;
+          if(game.round % 3 == 0) 
+            game.maxCardLevel++;
+          break;
+        }
+      }
+  
+    }
+
+  }
 }
 
 export class Impl implements Methods<InternalState> {
@@ -37,6 +74,9 @@ export class Impl implements Methods<InternalState> {
       playerState: new Map<UserId, PlayerState>(),
     };
   }
+
+
+
   joinGame(state: InternalState, userId: UserId, ctx: Context, request: IJoinGameRequest): Response {
     // check if player is already in a game
     if(state.playerGames.get(userId)) {
@@ -53,9 +93,11 @@ export class Impl implements Methods<InternalState> {
         round: 0,
         roundRemaining: 0,
         maxCardLevel: 1,
-        eventBus: "pending"
+        eventBus: createChannel()
       };
       state.games.push(game);
+
+      game.eventBus.subscribe('game', gameActions(game));
     }
 
     if(game.players.length >= 2) {
@@ -72,7 +114,7 @@ export class Impl implements Methods<InternalState> {
     state.playerState.set(userId, player);
 
     // enrol player to event bus
-    // game.eventBus.subscribe('player', playerActions(player));
+    game.eventBus.subscribe('player', playerActions(player, game));
 
     return Response.ok();  
   }
@@ -87,7 +129,8 @@ export class Impl implements Methods<InternalState> {
     }
 
     // trigger round start to player
-    // game.eventBus.publish('player', {players: 'all', action: 'refreshPickable'});
+    game.eventBus.publish('player', {skip: 'none', action: ['refreshPickable']});
+    game.eventBus.publish('game', {action: ['incRound']});
 
     game.round = 1;
     game.roundRemaining = 600.0

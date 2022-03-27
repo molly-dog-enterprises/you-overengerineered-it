@@ -13,6 +13,7 @@ types:
     actions: Action[]
     levels: LevelModifier
     canApplyToOthers: int
+    cardLevel: int
   CardState:
     card: Card
     level: int
